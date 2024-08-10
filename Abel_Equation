@@ -1,0 +1,348 @@
+# -*- coding: utf-8 -*-
+from manim import *
+
+#配置latex，引用宏包
+config.tex_template = TexTemplate(
+    preamble=r"""
+    \usepackage[UTF8]{ctex}
+    \usepackage{amsmath}
+    \usepackage{amsfonts}
+    \usepackage{amssymb}
+    """
+)
+
+
+class Abel_Equation(Scene):
+    def construct(self):
+
+        #改变相机视口大小
+        self.camera.frame_width = 16
+        self.camera.frame_height = 8
+
+        #前言：介绍阿贝尔恒等式
+        Definition = Tex(r"记$\sum_{k=1}^{n}a_{k}=A_{n},\sum_{k=1}^{n}b_{k}=B_{n}$")
+        Abel_equation = Tex(r"则有：$\sum_{k=1}^{n}a_{k}b_{k}=\sum_{k=1}^{n-1}(a_{k}-a_{k+1})B_{k}+a_{n}B_{n}$")
+        proof = Tex(r"证明：")
+        Abel_equation_step1 = Tex(r"$\sum_{k=1}^{n}a_{k}b_{k}=a_{1}b_{1}+\sum_{k=2}^{n}a_{k}b_{k}$")
+        Abel_equation_step2 = Tex(r"$\sum_{k=1}^{n}a_{k}b_{k}=a_{1}b_{1}+\sum_{k=2}^{n}a_{k}(B_{k}-B_{k-1})$")
+        Abel_equation_step3 = Tex(r"$\sum_{k=1}^{n}a_{k}b_{k}=a_{1}B_{1}+\sum_{k=2}^{n}a_{k}B_{k}-\sum_{k=2}^{n}a_{k}B_{k-1}$")
+        Abel_equation_step4 = Tex(r"$\sum_{k=1}^{n}a_{k}b_{k}=\sum_{k=1}^{n-1}a_{k}B_{k}+a_{n}B_{n}-\sum_{k=1}^{n-1}a_{k+1}B_{k}$")
+        Abel_equation_step5 = Tex(r"$\sum_{k=1}^{n}a_{k}b_{k}=\sum_{k=1}^{n-1}(a_{k}-a_{k+1})B_{k}+a_{n}B_{n}$")
+
+
+        # 排布公式位置，一行一行往下走
+        Definition.to_edge(UP)
+        Abel_equation.next_to(Definition, DOWN)
+        proof.next_to(Abel_equation, DOWN).align_to(Abel_equation,LEFT)
+        Abel_equation_step1.next_to(proof, DOWN).align_to(proof, LEFT)
+        Abel_equation_step2.next_to(Abel_equation_step1, DOWN).align_to(proof, LEFT)
+        Abel_equation_step3.next_to(Abel_equation_step2, DOWN).align_to(proof, LEFT)
+        Abel_equation_step4.next_to(Abel_equation_step3, DOWN).align_to(proof, LEFT)
+        Abel_equation_step5.next_to(Abel_equation_step4, DOWN).align_to(proof, LEFT)
+
+        # 公式推导
+        self.play(Write(Definition))
+        self.play(Write(Abel_equation))
+        self.play(Write(proof))
+        self.play(Write(Abel_equation_step1))
+        self.wait(1)
+        self.play(Write(Abel_equation_step2))
+        self.wait(1)
+        self.play(Write(Abel_equation_step3))
+        self.wait(1)
+        self.play(Write(Abel_equation_step4))
+        self.wait(1)
+        self.play(Write(Abel_equation_step5))
+        self.wait(5)
+        self.clear()
+
+        #第一部分：画出矩形，标好边长
+        # 矩形的长与宽
+        width = 6
+        height = 4
+        rect = Rectangle(width=width, height=height)
+
+        # 设置矩形的位置为屏幕中心
+        rect.move_to(ORIGIN)
+
+        # 添加矩形到场景中，并显示
+        self.play(Create(rect))
+        self.wait(1)
+
+        # 分割线的数目以及分割后小矩形的长与宽
+        num_height = 7
+        num_width = 7
+        unit_width = width / num_width
+        unit_height = height / num_height
+
+        # 获取顶点的坐标
+        ul = [-width / 2, height / 2, 0]
+        dl = [-width / 2, -height / 2, 0]
+        ur = [width / 2, height / 2, 0]
+        dr = [width / 2, -height / 2, 0]
+
+        # 获取横着的分割线
+        line_x=[]
+        for i in range(1, num_height):
+            p1 = [dl[0], dl[1] + i * unit_height, 0]
+            p2 = [dr[0], dr[1] + i * unit_height, 0]
+            line1 = Line(p1, p2)
+            line_x.append(line1)
+        
+        # 获取竖着的分割线
+        line_y=[]    
+        for i in range(1, num_width):
+            q1 = [dl[0] + i * unit_width, dl[1], 0]
+            q2 = [ul[0] + i * unit_width, ul[1], 0]
+            line2 = Line(q1, q2)
+            line_y.append(line2)
+
+        # 画出矩形的边框和分割线
+        self.play(Create(Line(ul, ur)), Create(Line(ur, dr)), Create(Line(dr, dl)), Create(Line(dl, ul)))
+        for line in line_x:
+            self.play(Create(line))
+        for line in line_y:
+            self.play(Create(line))
+
+        #  定义横线标签
+        b_1 = [dl[0] + unit_width, dl[1], 0]
+        line_b_1 = Line(dl, b_1)
+        brace_b_1 = Brace(line_b_1, DOWN)
+        brace_b_1_text = brace_b_1.get_text("$b_1$")
+
+        b_2 = [dl[0] + unit_width * 2, dl[1], 0]
+        line_b_2 = Line(b_1, b_2)
+        brace_b_2 = Brace(line_b_2, DOWN)
+        brace_b_2_text = brace_b_2.get_text("$b_2$")
+
+        b_3 = [dl[0] + unit_width * 3, dl[1], 0]
+        line_b_3 = Line(b_2, b_3)
+        brace_b_3 = Brace(line_b_3, DOWN)
+        brace_b_3_text = brace_b_3.get_text("$\\cdots$")
+
+        b_4 = [dl[0] + unit_width * 4, dl[1], 0]
+        line_b_4 = Line(b_3, b_4)
+        brace_b_4 = Brace(line_b_4, DOWN)
+        brace_b_4_text = brace_b_4.get_text("$\\cdots$")
+
+        b_5 = [dl[0] + unit_width * 5, dl[1], 0]
+        line_b_5 = Line(b_4, b_5)
+        brace_b_5 = Brace(line_b_5, DOWN)
+        brace_b_5_text = brace_b_5.get_text("$\\cdots$")
+
+        b_6 = [dl[0] + unit_width * 6, dl[1], 0]
+        line_b_6 = Line(b_5, b_6)
+        brace_b_6 = Brace(line_b_6, DOWN)
+        brace_b_6_text = brace_b_6.get_text("$b_{n-1}$")
+
+        b_7 = [dl[0] + unit_width * 7, dl[1], 0]
+        line_b_7 = Line(b_6, b_7)
+        brace_b_7 = Brace(line_b_7, DOWN)
+        brace_b_7_text = brace_b_7.get_text("$b_n$")
+
+        #画横线与标签
+        self.play(Create(brace_b_1), Write(brace_b_1_text))
+        self.play(Create(brace_b_2), Write(brace_b_2_text))
+        self.play(Create(brace_b_3), Write(brace_b_3_text))
+        self.play(Create(brace_b_4), Write(brace_b_4_text))
+        self.play(Create(brace_b_5), Write(brace_b_5_text))
+        self.play(Create(brace_b_6), Write(brace_b_6_text))
+        self.play(Create(brace_b_7), Write(brace_b_7_text))
+
+        # 画纵线标签
+        a1 = [dl[0], dl[1] + unit_height, 0]
+        line_a_1 = Line(dl, a1)
+        brace_a_1 = Brace(line_a_1, LEFT)
+        brace_a_1_text = brace_a_1.get_text("$a_1$")
+
+        a2 = [dl[0], dl[1] + 2 * unit_height, 0]
+        line_a_2 = Line(a1, a2)
+        brace_a_2 = Brace(line_a_2, LEFT)
+        brace_a_2_text = brace_a_2.get_text("$a_2$")
+
+        a3 = [dl[0], dl[1] + 3 * unit_height, 0]
+        line_a_3 = Line(a2, a3)
+        brace_a_3 = Brace(line_a_3, LEFT)
+        brace_a_3_text = brace_a_3.get_text("$\\vdots$")
+
+        a4 = [dl[0], dl[1] + 4 * unit_height, 0]
+        line_a_4 = Line(a3, a4)
+        brace_a_4 = Brace(line_a_4, LEFT)
+        brace_a_4_text = brace_a_4.get_text("$\\vdots$")
+
+        a5 = [dl[0], dl[1] + 5 * unit_height, 0]
+        line_a_5 = Line(a4, a5)
+        brace_a_5 = Brace(line_a_5, LEFT)
+        brace_a_5_text = brace_a_5.get_text("$\\vdots$")
+
+        a6 = [dl[0], dl[1] + 6 * unit_height, 0]
+        line_a_6 = Line(a5, a6)
+        brace_a_6 = Brace(line_a_6, LEFT)
+        brace_a_6_text = brace_a_6.get_text("$a_{n-1}$")
+
+        a7 = [dl[0], dl[1] + 7 * unit_height, 0]
+        line_a_7 = Line(a6, a7)
+        brace_a_7 = Brace(line_a_7, LEFT)
+        brace_a_7_text = brace_a_7.get_text("$a_n$")
+
+        self.play(Create(brace_a_1), Write(brace_a_1_text))
+        self.play(Create(brace_a_2), Write(brace_a_2_text))
+        self.play(Create(brace_a_3), Write(brace_a_3_text))
+        self.play(Create(brace_a_4), Write(brace_a_4_text))
+        self.play(Create(brace_a_5), Write(brace_a_5_text))
+        self.play(Create(brace_a_6), Write(brace_a_6_text))
+        self.play(Create(brace_a_7), Write(brace_a_7_text))
+
+
+        self.wait(1)
+
+        #第二部分，突出部分矩形
+
+        #定义函数获取每个小矩形顶点的坐标，以左下角向右上角横i纵j计数
+        def coord(i,j):
+            return [dl[0]+i*unit_width,dl[1]+j*unit_height,0]
+        
+        #画小长条
+        rect_1=Polygon(coord(0,0),coord(1,0),coord(1,1),coord(0,1),color=WHITE)
+        rect_2=Polygon(coord(1,0),coord(2,0),coord(2,2),coord(1,2),color=WHITE)
+        rect_3=Polygon(coord(2,0),coord(3,0),coord(3,3),coord(2,3),color=WHITE)
+        rect_4=Polygon(coord(3,0),coord(4,0),coord(4,4),coord(3,4),color=WHITE)
+        rect_5=Polygon(coord(4,0),coord(5,0),coord(5,5),coord(4,5),color=WHITE)
+        rect_6=Polygon(coord(5,0),coord(6,0),coord(6,6),coord(5,6),color=WHITE)
+        rect_7=Polygon(coord(6,0),coord(7,0),coord(7,7),coord(6,7),color=WHITE)
+
+        #把小长条装一起以便for循环
+        rectangles1=[rect_1,rect_2,rect_3,rect_4,rect_5,rect_6,rect_7]
+       
+       #for循环涂色
+        for i in rectangles1:
+            i.set_fill(BLUE,opacity=0.5)
+            self.play(Create(i))
+
+        # 添加数学表达式
+        expr1 = MathTex(r"\sum_{k=1}^{n}b_{k}A_{k}")
+        expr1.to_edge(RIGHT, buff=1)
+        expr1.shift(unit_width*LEFT)  # 将表达式放在右侧边缘
+        self.play(Write(expr1))
+
+        # 添加箭头
+        arrow1 = Arrow(start=rect.get_center()+[1*unit_width,0,0], end=expr1.get_left(), buff=0.1)
+        self.play(Create(arrow1))
+
+        self.wait(3)
+
+        #标记并涂色剩下的小长条
+        rect1=Polygon(coord(0,1),coord(1,1),coord(1,7),coord(0,7),color=WHITE)
+        rect2=Polygon(coord(1,2),coord(2,2),coord(2,7),coord(1,7),color=WHITE)
+        rect3=Polygon(coord(2,3),coord(3,3),coord(3,7),coord(2,7),color=WHITE)
+        rect4=Polygon(coord(3,4),coord(4,4),coord(4,7),coord(3,7),color=WHITE)
+        rect5=Polygon(coord(4,5),coord(5,5),coord(5,7),coord(4,7),color=WHITE)
+        rect6=Polygon(coord(5,6),coord(6,6),coord(6,7),coord(5,7),color=WHITE)
+        rect7=Polygon(coord(6,7),coord(7,7),coord(7,7),coord(6,7),color=WHITE)
+
+        rectangles2=[rect1,rect2,rect3,rect4,rect5,rect6,rect7]
+        #上色
+        for j in rectangles2:
+            j.set_fill(RED,opacity=0.5)
+            self.play(Create(j))
+
+        #第二串表达式
+        expr2=MathTex(r"\sum_{k=1}^{n-1} a_{k+1}B_{k}")
+        expr2.to_edge(LEFT)
+        self.play(Write(expr2))
+        
+        #第二个箭头
+        arrow2=Arrow(start=rect.get_center()-[unit_width,0,0],end=expr2.get_right(),buff=0.1)
+        self.play(Create(arrow2))
+        self.wait(2)
+        
+
+        #阿贝尔恒等式
+        equation = Tex(r"$S_{\text{蓝}} + S_{\text{红}} = S_{\text{总}}$")
+        formula_step1=MathTex(r"\sum_{k=1}^{n-1} a_{k+1}B_{k}+\sum_{k=1}^{n} b_{k}A_{k}=\sum_{k=1}^{n}a_{k}b_{k}")
+        formula_step2=MathTex(r"a_{k}\rightarrow a_{k}-a_{k-1},A_{k} \rightarrow a_{k}")
+        formula_step3=MathTex(r"\sum_{k=1}^{n}a_{k}b_{k}=\sum_{k=1}^{n-1}(a_{k}-a_{k+1})B_{k}+a_{n}B_{n}")
+        formula_step4=MathTex(r"\sum_{k=1}^{n}A_{k}b_{k}=-\sum_{k=1}^{n-1}a_{k+1}B_{k}+A_{n}B_{n}")
+        formula_step5=MathTex(r"\sum_{k=1}^{n-1}a_{k+1}B_{k}+\sum_{k=1}^{n}b_{k}A_{k}=A_{n}B_{n}")
+        formula_step6=Tex(r"而这正是根据图形面积得到的关系")
+        equation.to_edge(UP)
+        formula_step1.to_edge(UP)
+        formula_step2.next_to(formula_step1,DOWN)
+        formula_step3.next_to(formula_step2,DOWN)
+        formula_step4.next_to(formula_step3,DOWN)
+        formula_step6.next_to(formula_step5,DOWN)
+
+        #公式推导
+        self.play(Write(equation))
+        self.wait(2)
+        self.play(ReplacementTransform(equation,formula_step1))
+        self.wait(3)
+        self.clear()
+        self.add(formula_step1)
+        self.play(Write(formula_step2))
+        self.wait(1)
+        self.play(Write(formula_step3))
+        self.wait(1)
+        self.play(Write(formula_step4))
+        self.wait(1)
+        self.play(FadeOut(formula_step3))
+        self.play(ReplacementTransform(formula_step4,formula_step5))
+        self.play(Write(formula_step6))
+        self.wait(3)
+        self.clear()
+
+        #第三部分，阿贝尔恒等式的应用
+        #快速解决错位相减法求和的问题
+
+        use=Tex(r"阿贝尔恒等式可以帮助我们快速求出某些数列的和")
+        formula=Tex(r"$\sum_{k=1}^{n}a_kb_k=\sum_{k=1}^{n-1}(a_k-a_{k+1})B_{k}+a_{n}B_{n}$")
+        use.to_edge(UP)
+        formula.to_edge(UP)
+        self.play(Write(use))
+        self.wait(2)
+        self.play(ReplacementTransform(use,formula))
+        self.wait(2)
+
+        problem1=Tex(r"例：求$c_{n}=(2n-1)2^n$的前$n$项和")
+        solution_step1=Tex(r"令$a_{n}=2n-1,b_{n}=2^n,B_{n}=2^{n+1}-2$")
+        solution_step2=Tex(r"根据阿贝尔恒等式就有:$\sum_{k=1}^{n}c_{k}=\sum_{k=1}^{n-1}(-2)B_{k}+(2n-1)B_{n}$")
+        solution_step3=Tex(r"$\sum_{k=1}^{n}c_{k}=-2\sum_{k=1}^{n-1}(2^{k+1}-2)+(2n-1)(2^{n+1}-2)$")
+        solution_step4=Tex(r"$\sum_{k=1}^{n}c_{k}=(2n-3)2^{n+1}+6$")
+
+        problem1.next_to(formula,DOWN)
+        solution_step1.next_to(problem1,DOWN)
+        solution_step2.next_to(solution_step1,DOWN)
+        solution_step3.next_to(solution_step2,DOWN)
+        solution_step4.next_to(solution_step3,DOWN)
+        self.play(Write(problem1))
+        self.wait(1)
+        self.play(Write(solution_step1))
+        self.wait(1)
+        self.play(Write(solution_step2))
+        self.wait(1)
+        self.play(Write(solution_step3))
+        self.wait(1)
+        self.play(Write(solution_step4)) 
+        self.wait(3)
+        self.clear()
+
+        problem2=Tex(r"求数列$n^m(m \in \mathbb N)$的前$n$项和,以$m=2$为例")    
+        solu1=Tex(r"设$a_n=b_n=n,B_{n}=\frac{n(n+1)}{2}$")
+        solu2=Tex(r"$\sum_{k=1}^{n}k^2=\sum_{k=1}^{n-1}(-1)\frac{k(k+1)}{2}+n\frac{n(n+1)}{2}$")   
+        solu3=Tex(r"$\frac{3}{2}\sum_{k=1}^{n}k^2=\frac{n(n+1)(2n+1)}{4}$")
+        solu4=Tex(r"$\sum_{k=1}^{n}k^2=\frac{n(n+1)(2n+1)}{6}$")
+        problem2.to_edge(UP)
+        self.play(Write(problem2))
+        solu1.next_to(problem2,DOWN)
+        solu2.next_to(solu1,DOWN)
+        solu3.next_to(solu2,DOWN)
+        solu4.next_to(solu3,DOWN)
+        self.wait(2)
+        self.play(Write(solu1))
+        self.wait(1)
+        self.play(Write(solu2))
+        self.wait(1)
+        self.play(Write(solu3))
+        self.wait(1)
+        self.play(Write(solu4))
+        self.wait(3)
